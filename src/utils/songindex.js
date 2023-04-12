@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 const mapDBToModel = ({
   id,
+  name,
   title,
   year,
   genre,
@@ -9,6 +10,7 @@ const mapDBToModel = ({
   albumId,
 }) => ({
   id,
+  name,
   title,
   year,
   genre,

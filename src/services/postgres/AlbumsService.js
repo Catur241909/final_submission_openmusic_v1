@@ -11,7 +11,6 @@ class AlbumsService {
 
   async addAlbum({ name, year }) {
     const id = nanoid(16);
-
     const query = {
       text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
       values: [id, name, year],
@@ -35,30 +34,21 @@ class AlbumsService {
       values: [id],
     };
 
-    const fetchAlbum = await this.pool.query(queryAlbum);
+    const result = await this.pool.query(queryAlbum);
 
-    if (!fetchAlbum.rows.length) {
+    if (!result.rows.length) {
       throw new NotFoundError('Album tidak ditemukan');
     }
 
-    return {
-      id: fetchAlbum.rows[0].id,
-      name: fetchAlbum.rows[0].name,
-      year: fetchAlbum.rows[0].year,
-      songs: [],
-    };
+    return result.rows.map(mapDBToModel)[0];
   }
 
-  async getsongsbyalbumId(albumId) {
+  async getsongsbyalbumId(id) {
     const query = {
-      text: 'SELECT * FROM songs WHERE "albumId" = $7',
-      values: [albumId],
+      text: 'SELECT id, title, performer FROM songs WHERE "albumId" = $1',
+      values: [id],
     };
     const result = await this.pool.query(query);
-    if (!result.rows.length) {
-      throw new NotFoundError('Lagu tidak ditemukan');
-    }
-
     return result.rows.map(mapDBToModel)[0];
   }
 

@@ -48,15 +48,15 @@ class AlbumsHandler {
 
   async getalbumByIdHandler(request, h) {
     try {
-      const { id, albumId } = request.params;
-      const albumdata = await this.service.getAlbumById(id);
-      const songs = await this.service.getsongsbyalbumId(albumId);
+      const { id } = request.params;
+      const album = await this.service.getAlbumById(id);
+      const songs = await this.service.getsongsbyalbumId(id);
+      const getDetailAlbumWichContainsSongs = { ...album, songs };
       const response = h.response({
         status: 'success',
         message: 'berhasil mendapatkan album',
         data: {
-          ...albumdata,
-          songs,
+          album: getDetailAlbumWichContainsSongs,
         },
       });
       response.code(200);
@@ -87,12 +87,10 @@ class AlbumsHandler {
       await this.validator.validatealbumPayloads(request.payload);
       const { id } = request.params;
       await this.service.editAlbumById(id, request.payload);
-      const response = h.response({
+      return {
         status: 'success',
-        message: 'album berhasil diubah',
-      });
-      response.code(200);
-      return response;
+        message: 'Album berhasil diperbarui',
+      };
     } catch (error) {
       if (error instanceof ClientError) {
         const response = h.response({
