@@ -5,25 +5,32 @@ class SongsHandler {
     this.service = service;
     this.validator = validator;
 
-    this.postsongHandler = this.postsongHandler.bind(this);
-    this.getsongsHandler = this.getsongsHandler.bind(this);
-    this.getsongByIdHandler = this.getsongByIdHandler.bind(this);
-    this.putsongByIdHandler = this.putsongByIdHandler.bind(this);
-    this.deletesongByIdHandler = this.deletesongByIdHandler.bind(this);
+    this.postSongHandler = this.postSongHandler.bind(this);
+    this.getSongsHandler = this.getSongsHandler.bind(this);
+    this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
+    this.putSongByIdHandler = this.putSongByIdHandler.bind(this);
+    this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
   }
 
-  async postsongHandler(request, h) {
+  async postSongHandler(request, h) {
     try {
-      this.validator.validatesongPayloads(request.payload);
+      this.validator.validateSongPayload(request.payload);
       const {
-        title = 'untitled', year, genre, performer, duration, albumId,
-      } = request.payload;
-      const songId = await this.service.addSong({
         title, year, genre, performer, duration, albumId,
+      } = request.payload;
+
+      const songId = await this.service.addSong({
+        title,
+        year,
+        genre,
+        performer,
+        duration,
+        albumId,
       });
+
       const response = h.response({
         status: 'success',
-        message: 'lagu berhasil ditambahkan',
+        message: 'Data berhasil ditambahkan',
         data: {
           songId,
         },
@@ -39,7 +46,6 @@ class SongsHandler {
         response.code(error.statusCode);
         return response;
       }
-
       // Server ERROR!
       const response = h.response({
         status: 'error',
@@ -51,8 +57,8 @@ class SongsHandler {
     }
   }
 
-  async getsongsHandler() {
-    const songs = await this.service.getSongs();
+  async getSongsHandler(request) {
+    const songs = await this.service.getSongs(request.query);
     return {
       status: 'success',
       data: {
@@ -61,10 +67,11 @@ class SongsHandler {
     };
   }
 
-  async getsongByIdHandler(request, h) {
+  async getSongByIdHandler(request, h) {
     try {
       const { id } = request.params;
       const song = await this.service.getSongById(id);
+
       return {
         status: 'success',
         data: {
@@ -80,7 +87,6 @@ class SongsHandler {
         response.code(error.statusCode);
         return response;
       }
-
       // Server ERROR!
       const response = h.response({
         status: 'error',
@@ -92,14 +98,17 @@ class SongsHandler {
     }
   }
 
-  async putsongByIdHandler(request, h) {
+  async putSongByIdHandler(request, h) {
     try {
-      this.validator.validatesongPayloads(request.payload);
+      this.validator.validateSongPayload(request.payload);
+
       const { id } = request.params;
+
       await this.service.editSongById(id, request.payload);
+
       return {
         status: 'success',
-        message: 'lagu berhasil diperbarui',
+        message: 'Data berhasil diperbarui',
       };
     } catch (error) {
       if (error instanceof ClientError) {
@@ -110,7 +119,6 @@ class SongsHandler {
         response.code(error.statusCode);
         return response;
       }
-
       // Server ERROR!
       const response = h.response({
         status: 'error',
@@ -122,13 +130,13 @@ class SongsHandler {
     }
   }
 
-  async deletesongByIdHandler(request, h) {
+  async deleteSongByIdHandler(request, h) {
     try {
       const { id } = request.params;
       await this.service.deleteSongById(id);
       return {
         status: 'success',
-        message: 'lagu berhasil dihapus',
+        message: 'Data berhasil dihapus',
       };
     } catch (error) {
       if (error instanceof ClientError) {
@@ -139,7 +147,6 @@ class SongsHandler {
         response.code(error.statusCode);
         return response;
       }
-
       // Server ERROR!
       const response = h.response({
         status: 'error',
@@ -151,4 +158,5 @@ class SongsHandler {
     }
   }
 }
+
 module.exports = SongsHandler;

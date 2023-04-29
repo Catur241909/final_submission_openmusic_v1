@@ -1,23 +1,24 @@
 const routes = (handler) => [
+
   {
     method: 'POST',
     path: '/albums',
-    handler: handler.postalbumHandler,
+    handler: handler.postAlbumHandler,
   },
   {
     method: 'GET',
     path: '/albums/{id}',
-    handler: handler.getalbumByIdHandler,
+    handler: handler.getAlbumByIdHandler,
   },
   {
     method: 'PUT',
     path: '/albums/{id}',
-    handler: handler.putalbumByIdHandler,
+    handler: handler.putAlbumByIdHandler,
   },
   {
     method: 'DELETE',
     path: '/albums/{id}',
-    handler: handler.deletealbumByIdHandler,
+    handler: handler.deleteAlbumByIdHandler,
   },
 ];
 module.exports = routes;

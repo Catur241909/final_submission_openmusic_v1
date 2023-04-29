@@ -1,55 +1,51 @@
-const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
+const { Pool } = require('pg');
+
 const InvariantError = require('../../exceptions/InvariantError');
-const { mapDBToModel } = require('../../utils/albumindex');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const { mapDBToModelAlbums, mapOptSong } = require('../../utils/index');
 
 class AlbumsService {
-  constructor() {
+  constructor(cacheService) {
     this.pool = new Pool();
+
+    this.cacheService = cacheService;
   }
 
   async addAlbum({ name, year }) {
-    const id = nanoid(16);
+    const id = `album-${nanoid(16)}`;
+
     const query = {
       text: 'INSERT INTO albums VALUES($1, $2, $3) RETURNING id',
       values: [id, name, year],
     };
+
     const result = await this.pool.query(query);
+
     if (!result.rows[0].id) {
-      throw new InvariantError('Album gagal ditambahkan');
+      throw new InvariantError('Data Album gagal ditambahkan');
     }
 
     return result.rows[0].id;
   }
 
-  async getAlbums() {
-    const result = await this.pool.query('SELECT * FROM albums');
-    return result.rows.map(mapDBToModel);
-  }
-
   async getAlbumById(id) {
-    const queryAlbum = {
-      text: 'SELECT * FROM albums WHERE id = $1',
-      values: [id],
-    };
-
-    const result = await this.pool.query(queryAlbum);
-
-    if (!result.rows.length) {
-      throw new NotFoundError('Album tidak ditemukan');
-    }
-
-    return result.rows.map(mapDBToModel)[0];
-  }
-
-  async getsongsbyalbumId(id) {
     const query = {
-      text: 'SELECT id, title, performer FROM songs WHERE "albumId" = $1',
+      text: `SELECT albums.*, songs.id as song_id, songs.year as song_year, songs.performer FROM albums
+      LEFT JOIN songs ON songs.album_id = albums.id WHERE albums.id = $1`,
       values: [id],
     };
     const result = await this.pool.query(query);
-    return result.rows.map(mapDBToModel)[0];
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Data Album tidak ditemukan');
+    }
+
+    const songs = result.rows.map(mapOptSong);
+
+    const mappedResult = result.rows.map(mapDBToModelAlbums)[0];
+
+    return { ...mappedResult, songs };
   }
 
   async editAlbumById(id, { name, year }) {
@@ -59,8 +55,9 @@ class AlbumsService {
     };
 
     const result = await this.pool.query(query);
+
     if (!result.rows.length) {
-      throw new NotFoundError('Gagal memperbarui Album. Id tidak ditemukan');
+      throw new NotFoundError('Gagal memperbarui Data album. Id tidak ditemukan');
     }
   }
 
@@ -71,6 +68,7 @@ class AlbumsService {
     };
 
     const result = await this.pool.query(query);
+
     if (!result.rows.length) {
       throw new NotFoundError('Album gagal dihapus. Id tidak ditemukan');
     }
