@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-const mapDBToModelAlbums = ({
+const mapAlbumsToDBModel = ({
   id,
   name,
   year,
@@ -9,36 +9,32 @@ const mapDBToModelAlbums = ({
   year,
 });
 
-const mapOptSong = ({ song_id, song_title, performer }) => ({
-  id: song_id,
-  title: song_title,
+const mapSongsToDBModel = ({
+  id,
+  title,
+  year,
   performer,
+  genre,
+  duration,
+  album_id,
+}) => ({
+  id,
+  title,
+  year,
+  performer,
+  genre,
+  duration,
+  albumId: album_id,
 });
 
-const mapPlaylistDBToModel = ({ id, name, username }) => ({
+const mapPlaylistToDBModel = ({
+  id,
+  name,
+  username,
+}) => ({
   id,
   name,
   username,
 });
 
-const mapDBToModelSongs = ({
-  id,
-  title,
-  year,
-  genre,
-  performer,
-  duration,
-  albumId,
-}) => ({
-  id,
-  title,
-  year,
-  genre,
-  performer,
-  duration,
-  albumId,
-});
-
-module.exports = {
-  mapDBToModelAlbums, mapOptSong, mapPlaylistDBToModel, mapDBToModelSongs,
-};
+module.exports = { mapAlbumsToDBModel, mapSongsToDBModel, mapPlaylistToDBModel };

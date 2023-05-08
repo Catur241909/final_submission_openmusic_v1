@@ -1,7 +1,6 @@
 {
   "name": "submission-open-music-v1",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start-prod": "NODE_ENV=production node ./src/server.js",
@@ -13,18 +12,32 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/hapi": "^21.3.1",
+    "@hapi/inert": "^7.1.0",
     "@hapi/jwt": "^3.2.0",
+    "amqplib": "^0.10.3",
+    "auto-bind": "^4.0.0",
     "bcrypt": "^5.1.0",
     "dotenv": "^16.0.3",
     "joi": "^17.9.1",
     "nanoid": "^3.3.6",
     "node-pg-migrate": "^6.2.2",
-    "pg": "^8.10.0"
+    "pg": "^8.10.0",
+    "redis": "^4.6.6"
   },
   "devDependencies": {
     "eslint": "^8.38.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.27.5",
     "nodemon": "^2.0.22"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Catur241909/final_submission_openmusic_v1.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/Catur241909/final_submission_openmusic_v1/issues"
+  },
+  "homepage": "https://github.com/Catur241909/final_submission_openmusic_v1#readme",
+  "description": ""
 }
