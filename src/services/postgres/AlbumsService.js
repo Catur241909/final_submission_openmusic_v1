@@ -79,17 +79,6 @@ class AlbumsService {
     }
   }
 
-  async checkAlbum(id) {
-    const query = {
-      text: 'SELECT * from albums WHERE id = $1',
-      values: [id],
-    };
-    const result = await this.pool.query(query);
-    if (!result.rowCount) {
-      throw new NotFoundError('Album tidak ditemukan');
-    }
-  }
-
   async addLikeDislikeAlbum(albumId, userId) {
     const queryCheckLike = {
       text: 'SELECT id FROM user_album_likes WHERE user_id = $1 AND album_id = $2',
@@ -135,31 +124,18 @@ class AlbumsService {
   }
 
   async deleteLikes(albumId, userId) {
-    try {
-      // mendapatkan catatan dari cache
-      const result = await this.cacheService.delete(`albumLikes:${albumId}`);
-      return {
-        likes: JSON.parse(result),
-        source: 'cache',
+    const queryCheckLike = {
+      text: 'SELECT id FROM user_album_likes WHERE user_id = $1 AND album_id = $2',
+      values: [userId, albumId],
+    };
+    const resultCheckLike = await this.pool.query(queryCheckLike);
+    if (resultCheckLike.rowCount) {
+      const queryDeleteLike = {
+        text: 'DELETE FROM user_album_likes WHERE id = $1',
+        values: [resultCheckLike.rows[0].id],
       };
-    } catch (error) {
-      const queryCheckLike = {
-        text: 'SELECT id FROM user_album_likes WHERE user_id = $1 AND album_id = $2',
-        values: [userId, albumId],
-      };
-      const resultCheckLike = await this.pool.query(queryCheckLike);
-      if (resultCheckLike.rowCount) {
-        const queryDeleteLike = {
-          text: 'DELETE FROM user_album_likes WHERE id = $1',
-          values: [resultCheckLike.rows[0].id],
-        };
-        const result = await this.pool.query(queryDeleteLike);
-        await this.cacheService.set(`albumLikes:${albumId}`, JSON.stringify(result.rowCount));
-      }
-      return {
-        likes: result.rowCount,
-        source: 'database',
-      };
+      const result = await this.pool.query(queryDeleteLike);
+      await this.cacheService.delete(`albumLikes:${albumId}`, JSON.stringify(result.rowCount));
     }
   }
 }

@@ -4,7 +4,7 @@ const routes = (handler) => [
     path: '/export/playlists/{playlistId}',
     handler: handler.postExportPlaylistHandler,
     options: {
-      auth: 'notesapp_jwt',
+      auth: 'openmusicsapp_jwt',
     },
   },
 ];

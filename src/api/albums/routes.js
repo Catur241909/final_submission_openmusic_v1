@@ -48,13 +48,16 @@ const routes = (handler) => [
     path: '/albums/{id}/likes',
     handler: handler.postAlbumLikeHandler,
     options: {
-      auth: 'notesapp_jwt',
+      auth: 'openmusicsapp_jwt',
     },
   },
   {
     method: 'DELETE',
     path: '/albums/{id}/likes',
     handler: handler.deleteAlbumLikesHandler,
+    options: {
+      auth: 'openmusicsapp_jwt',
+    },
   },
   {
     method: 'GET',

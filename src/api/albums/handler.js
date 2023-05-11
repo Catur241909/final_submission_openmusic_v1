@@ -71,7 +71,7 @@ class AlbumsHandler {
   async postAlbumLikeHandler(request, h) {
     const { id } = request.params;
     const { id: credentialId } = request.auth.credentials;
-    await this.service.checkAlbum(id);
+    await this.service.getAlbumById(id);
     await this.service.addLikeDislikeAlbum(id, credentialId);
     return h.response({
       status: 'success',
@@ -81,7 +81,7 @@ class AlbumsHandler {
 
   async getAlbumLikesHandler(request, h) {
     const { id } = request.params;
-    await this.service.checkAlbum(id);
+    await this.service.getAlbumById(id);
     const result = await this.service.getLikes(id);
     const response = h.response({
       status: 'success',
@@ -96,7 +96,9 @@ class AlbumsHandler {
 
   async deleteAlbumLikesHandler(request, h) {
     const { id } = request.params;
-    await this.service.deleteLikes(id);
+    const { id: credentialId } = request.auth.credentials;
+    await this.service.getAlbumById(id);
+    await this.service.deleteLikes(id, credentialId);
     return h.response({
       status: 'success',
       message: 'Batal menyukai album',
